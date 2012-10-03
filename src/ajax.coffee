@@ -69,7 +69,17 @@ class Base
     promise
 
   ajaxSettings: (params, defaults) ->
-    $.extend({}, @defaults, defaults, params)
+    params = $.extend({}, @defaults, defaults, params)
+    params.data = $.extend(params.data, params.headers)
+    delete params['headers']
+    if params.data['Authorization']
+      params.data['oauth_token']=params.data['Authorization']
+      delete params.data['Authorization']
+    params['processData'] = true
+    params['dataType'] = 'json'
+    delete params.data['X-Requested-With']
+    delete params['contentType'] if params['type']=='GET'
+    return params
 
 class Collection extends Base
   constructor: (@model) ->
